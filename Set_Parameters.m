@@ -2,13 +2,13 @@
 %% SET PARAMETERS
 
     % Define the coronagraph system
-        Coronagraph = 2;
+        Coronagraph = 1;
     % 0: propagation in the raw imaging system without occulters A+B+C+D
 	% 1: propagation through Lyot coronagraph A+B+C+D
 	% 2: propagation through externally occulted Lyot coronagraph O+A+O'+C+D
     
     % Diffraction from the external occulter to be loaded
-	    Psi_0_filename = './Hankel_R710_z144348_lambda570.mat'; % [string]
+	    Psi_0_filename = './Hankel_R710_z144348_lambda550.mat'; % [string]
 	% Matlab variable name shall be Psi_0
         Psi_0_radius_filename = './Hankel_R710_z144348_radius.mat'; % [string]
 	% Matlab variable name shall be Psi_0_radius
@@ -18,11 +18,11 @@
     % Matlab variable name shall be CDF
 
     % Define planes to save
-        To_save = [0, 0, 1];
+        To_save = [1, 1, 1];
     % To_save = [plane B or O', plane C, plane D]
         
     % Optical parameters    
-        lambda = 570; %[nm]
+        lambda = 550; %[nm]
         z = 144.348; % [m]
         Rsun = 0.00465421; % [rad]
 
@@ -61,7 +61,7 @@
 		Sigma_ab_plane_C = [0, 0, 0, 0, 0, 0, 0, 0]; % [lambda unit] for plane C
     
     % Roughness scattering    
-        Inc_scatt = [1, 0, 0]; % to include scattering in planes [A, B or O', C] 
+        Inc_scatt = [0, 0, 0]; % to include scattering in planes [A, B or O', C] 
         % PSD_param = [A [nm2.mm] amplitude, B [mm] correlation width, C slope]
         PSD_param_plane_A = [3.75e-1, 1.79e-1, 0.82]; % ABC parameters for plane A
         PSD_param_plane_BOp = [0, 0, 0]; % ABC parameters for plane B or O'
@@ -71,7 +71,7 @@
         seed_plane_C = 2017; % for the random process in plane C
     
     % Source definition   
-        Source_type = 0; 
+        Source_type = 1; 
         % 0: one single point source (a,b)
         % 1: integration over the full solar disc
 		% 2: vignetted region 

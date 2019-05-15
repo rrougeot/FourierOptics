@@ -10,9 +10,9 @@ Set_Parameters;
 
 %%%%%
 
-Study_name = 'System_SL';
-Filename_parameters = ['/home/rrougeot/PhD/Files_Manuscript/' Study_name, '_param.mat'];
-Filename_results = ['/home/rrougeot/PhD/Files_Manuscript/',Study_name, '_results.mat'];
+Study_name = '';
+Filename_parameters = ['/home/*/' Study_name, '_param.mat'];
+Filename_results = ['/home/*/',Study_name, '_results.mat'];
 
 % Save current parameters of the study
 save(Filename_parameters);

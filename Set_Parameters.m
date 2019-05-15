@@ -2,19 +2,20 @@
 %% SET PARAMETERS
 
     % Define the coronagraph system
-        Coronagraph = 1;
-    % 0: propagation in the raw imaging system without occulters A+B+C+D
-	% 1: propagation through Lyot coronagraph A+B+C+D
-	% 2: propagation through externally occulted Lyot coronagraph O+A+O'+C+D
+        Coronagraph = 3;
+    % 0: Raw imaging system without occulters A+B+C+D
+	% 1: External coronagraph O+A+B
+	% 2: Classic Lyot coronagraph A+B+C+D
+	% 3: Externally occulted Lyot coronagraph O+A+O'+C+D
     
     % Diffraction from the external occulter to be loaded
-	    Psi_0_filename = './Hankel_R710_z144348_lambda550.mat'; % [string]
+	    Psi_0_filename = './*.mat'; % [string]
 	% Matlab variable name shall be Psi_0
-        Psi_0_radius_filename = './Hankel_R710_z144348_radius.mat'; % [string]
+        Psi_0_radius_filename = './*.mat'; % [string]
 	% Matlab variable name shall be Psi_0_radius
 	
     % CDF curve to be loaded, for adaptive solar sampling
-	    CDF_filename = './CDF_processed.mat'; % [string]
+	    CDF_filename = './*.mat'; % [string]
     % Matlab variable name shall be CDF
 
     % Define planes to save
@@ -26,13 +27,13 @@
         z = 144.348; % [m]
         Rsun = 0.00465421; % [rad]
 
-        R = 710; % [mm]
-        f = 330.348; % [mm]
-        n = 1.5; % refractive index
+        R = ; % [mm]
+        f = ; % [mm]
+        n = ; % refractive index
 
         Rp = 25; % [mm]
-        Rm_1 = 0.489; % [mm] 
-        Rm_2 = 1.662; % [mm]
+        Rm_1 = 0; % [mm] 
+        Rm_2 = 1.629; % [mm]
 		Rm_3 = 0; % [mm]
         Rl = 0.97; % [Rp unit]
     
@@ -43,7 +44,7 @@
 		Sampling_plane_A_type = 1;
         % 0: fixed spatial sampling s_a in plane A
         % 1: smart sampling in plane A
-		s_a = 10; % [micron]
+		s_a = 15; % [micron]
 
     % Normalisation
         Norm_plane = 'D'; % Norm the Sun in plane 'D' or plane 'B'

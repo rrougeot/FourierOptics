@@ -13,10 +13,11 @@ function [Results] = Coronagraph_model(Parameters,Filename_results)
 %
 %
 % -Inputs: Parameters, Matlab structure which contains:
-%   - Coronagraph: 0, 1 or 2
-%     0: propagation in the raw imaging system without occulters
-%     1: propagation through the classic Lyot coronagraph
-%     2: propagation through externally occulted Lyot coronagraph
+%   - Coronagraph: 0, 1, 2 or 2
+% 	  0: Raw imaging system without occulters A+B+C+D
+%     1: External coronagraph O+A+B
+%     2: Classic Lyot coronagraph A+B+C+D
+%     3: Externally occulted Lyot coronagraph O+A+O'+C+D
 %   - Psi_0_filename: location of 1D diffracted wave front in plane A [string]
 %   - Psi_0_radius_filename: location of 1D radius in plane A [string]
 %   - CDF_filename: location of CDF curve for adaptive sampling [string]
@@ -123,15 +124,15 @@ Results = struct();
     if(Sampling_plane_A_type)
 		if(Coronagraph == 0 || Coronagraph == 1)
 			s_a = sqrt( (Rp * lambda)/(N * Rsun)); % [m]
-		elseif(Coronagraph == 2)
+		elseif(Coronagraph == 3)
 			s_a = sqrt( (Rp * lambda * z)/(N * R)); % [m]
 		end
     end
 	
 	% Sampling in plane B/O'
-    if(Coronagraph == 0 || Coronagraph == 1)
+    if(Coronagraph == 0 || Coronagraph == 1 || Coronagraph == 2)
     	s_bop = lambda * f / s_a / N; % [m]
-    elseif(Coronagraph == 2)
+    elseif(Coronagraph == 3)
 		z1 = f*z/(z-f); % [m]
     	s_bop = lambda * z1 / s_a / N; % [m]
     end
@@ -162,12 +163,12 @@ Results = struct();
     end
     
 	% Fresnel propagator
-    if(Coronagraph == 2)
+    if(Coronagraph == 3)
         F = Fresnel(lambda, -z, r, s_a);
     end
  
     % Load diffraction complex amplitude
-    if(Coronagraph == 2)
+    if(Coronagraph == 1 || Coronagraph == 3)
         load(Psi_0_filename);
         load(Psi_0_radius_filename);
     end
@@ -291,7 +292,7 @@ Results = struct();
         T = Tilt(lambda, alpha, beta, x, y, s_a);
         
 		% Diffracted wavefront
-        if (Coronagraph == 2)
+        if (Coronagraph == 1 || Coronagraph == 3)
              Wd = Diffraction_interp(alpha+dalpha, beta+dbeta, x, y, dx, dy, z, s_a, Psi_0_radius, Psi_0); 
         else Wd = 1;   
         end
@@ -303,11 +304,14 @@ Results = struct();
             Psi_C = Fourier( Psi_BOp .* Wr_bop, N);
             Psi_D = Fourier( L .* Psi_C .* Wab_c .* Wr_c, N);
 		elseif(Coronagraph == 1)
+            Psi_A = P .* Wd .* Wab_a .* Wr_a .* T;
+            Psi_BOp = Fourier( Psi_A, N);
+		elseif(Coronagraph == 2)
             Psi_A = P .* Wab_a .* Wr_a .* T;
             Psi_BOp = Fourier( Psi_A, N);
             Psi_C = Fourier( M .* Psi_BOp .* Wr_bop, N);
             Psi_D = Fourier( L .* Psi_C .* Wab_c .* Wr_c, N);
-        elseif (Coronagraph == 2)
+        elseif (Coronagraph == 3)
             Psi_A = P .* Wd .* Wab_a .* Wr_a .* T;
             Psi_BOp = Fourier( Psi_A .* F, N);
             Psi_C = Fourier( M .* Psi_BOp .* Wr_bop, N) .* conj(F);
@@ -323,9 +327,11 @@ Results = struct();
             I_D_2D = I_D_2D + dS(i) * G2 * G1 * LB(i) * abs(Psi_D).^2;
         elseif (Coronagraph == 1)
             I_BOp_2D = I_BOp_2D + dS(i) * G2 * LB(i) * abs(Psi_BOp).^2;
+        elseif (Coronagraph == 2)
+            I_BOp_2D = I_BOp_2D + dS(i) * G2 * LB(i) * abs(Psi_BOp).^2;
             I_C_2D = I_C_2D + dS(i) * G2 * LB(i) * abs(Psi_C).^2;
             I_D_2D = I_D_2D + dS(i) * G2 * G1 * LB(i) * abs(Psi_D).^2;
-        elseif (Coronagraph == 2)
+        elseif (Coronagraph == 3)
             I_BOp_2D = I_BOp_2D + dS(i) * G2 * LB(i) * abs(Psi_BOp).^2;
             I_C_2D = I_C_2D + dS(i) * G2 * LB(i) * abs(Psi_C).^2;
             I_D_2D = I_D_2D + dS(i) * G2 * G1 * LB(i) * abs(Psi_D).^2;
@@ -349,9 +355,9 @@ Results = struct();
 	% Single point source: 2D images
     if (Source_type == 0) 
 		if(To_save(1))
-		if (Coronagraph == 0 || Coronagraph == 1)
+		if (Coronagraph == 0 || Coronagraph == 1 || Coronagraph == 2)
 		Results.I_B = I_BOp_2D;	
-		elseif (Coronagraph == 2)
+		elseif (Coronagraph == 3)
         Results.I_Op = I_BOp_2D;
         end
 		end
@@ -375,9 +381,9 @@ Results = struct();
             I_D_1D = Circular_Int(v,v,I_D_2D,Ntheta_sun) * Isun;
             
 			if(To_save(1))
-			if (Coronagraph == 0 || Coronagraph == 1)
+			if (Coronagraph == 0 || Coronagraph == 1 || Coronagraph == 2)
 			Results.I_B = I_BOp_1D;	
-			elseif (Coronagraph == 2)
+			elseif (Coronagraph == 3)
             Results.I_Op = I_BOp_1D;
             end
 			end
@@ -403,9 +409,9 @@ Results = struct();
             I_D_2D = I_D_2D * Isun;
         		
             if(To_save(1))
-			if (Coronagraph == 0 || Coronagraph == 1)
+			if (Coronagraph == 0 || Coronagraph == 1 || Coronagraph == 2)
 			Results.I_B = I_BOp_2D;	
-			elseif (Coronagraph == 2)
+			elseif (Coronagraph == 3)
             Results.I_Op = I_BOp_2D;
             end
 			end

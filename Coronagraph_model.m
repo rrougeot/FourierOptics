@@ -44,6 +44,7 @@ function [Results] = Coronagraph_model(Parameters,Filename_results)
 %     reduction)
 %   - Isun: Brightness at the centre of the solar disk image
 %   - Delta_pos: 1x2 vector with lateral misalignement occulter/pupil [mm]
+%   - Delta_ang: 1x2 vector with offpointing of the coronagraph wrt sun-pointing [arcsec]
 %   - Inc_aber: 1x2 bolean to include aberrations in plane A and C
 %     0: no optical aberration
 %     1: include optical aberrations
